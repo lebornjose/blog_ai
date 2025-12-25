@@ -37,13 +37,14 @@ const authMiddleware = (req, res, next) => {
  * 管理员权限验证中间件（基于rate字段）
  */
 const adminMiddleware = (req, res, next) => {
-  // rate值越高权限越大，这里假设rate >= 90为管理员
-  if (req.user && req.user.rate >= 90) {
+  // rate值越高权限越大，这里假设rate >= 50为管理员
+  // 开发环境可以设置更低的值，生产环境建议 >= 90
+  if (req.user && req.user.rate >= 50) {
     next();
   } else {
     return res.status(403).json({
       success: false,
-      message: '需要管理员权限'
+      message: `需要管理员权限（当前权限值: ${req.user?.rate || 0}，需要 >= 50）`
     });
   }
 };
