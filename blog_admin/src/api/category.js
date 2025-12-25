@@ -5,9 +5,19 @@ import request from '@/utils/request'
  */
 export function getCategoryList(params) {
   return request({
-    url: '/categories',
+    url: '/categories/list',
     method: 'get',
     params
+  })
+}
+
+/**
+ * 获取所有分类（不分页）
+ */
+export function getAllCategories() {
+  return request({
+    url: '/categories/all',
+    method: 'get'
   })
 }
 
@@ -50,6 +60,17 @@ export function deleteCategory(id) {
   return request({
     url: `/categories/${id}`,
     method: 'delete'
+  })
+}
+
+/**
+ * 批量删除分类
+ */
+export function batchDeleteCategories(ids) {
+  return request({
+    url: '/categories/batch-delete',
+    method: 'post',
+    data: { ids }
   })
 }
 
