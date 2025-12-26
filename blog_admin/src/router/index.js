@@ -54,10 +54,10 @@ const routes = [
         meta: { title: '分类管理', icon: 'TagsOutlined' }
       },
       {
-        path: 'comments',
-        name: 'Comments',
-        component: () => import('@/views/comments/CommentList.vue'),
-        meta: { title: '评论管理', icon: 'CommentOutlined' }
+        path: 'recommends',
+        name: 'Recommends',
+        component: () => import('@/views/recommends/RecommendList.vue'),
+        meta: { title: '推荐管理', icon: 'StarOutlined' }
       }
     ]
   },

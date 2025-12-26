@@ -1,9 +1,22 @@
 {
-    "name": "blog_ai",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": [
-      "blog_admin",
-      "blog_serve"
-    ]
+  "name": "blog_ai",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "blog_admin",
+    "blog_serve"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:serve\" \"npm run dev:admin\"",
+    "dev:admin": "npm run dev --workspace=blog_admin",
+    "dev:serve": "npm run dev --workspace=blog_serve",
+    "start": "concurrently \"npm run start:serve\" \"npm run start:admin\"",
+    "start:admin": "npm run dev --workspace=blog_admin",
+    "start:serve": "npm run start --workspace=blog_serve",
+    "build:admin": "npm run build --workspace=blog_admin",
+    "install:all": "npm install && npm install --workspace=blog_admin && npm install --workspace=blog_serve"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
+}
