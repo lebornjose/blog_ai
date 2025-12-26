@@ -29,13 +29,13 @@ app.get('/', (req, res) => {
 const userRoutes = require('./routes/user.routes');
 const articleRoutes = require('./routes/article.routes');
 const categoryRoutes = require('./routes/category.routes');
-const commentRoutes = require('./routes/comment.routes');
+const recommendRoutes = require('./routes/recommend.routes');
 
 // 使用路由
 app.use('/api/users', userRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/comments', commentRoutes);
+app.use('/api/recommends', recommendRoutes);
 
 // 404 处理
 app.use((req, res) => {

@@ -34,7 +34,15 @@
             </a-space>
           </template>
           <template v-else-if="column.key === 'pubtime'">
-            {{ record.pubtime ? new Date(record.pubtime).toLocaleString('zh-CN') : '-' }}
+            {{ record.pubtime ? new Date(record.pubtime * 1000).toLocaleString('zh-CN') : '-' }}
+          </template>
+          <template v-else-if="column.key === 'keyword'">
+            <a-space v-if="record.keyword" wrap>
+              <a-tag v-for="(kw, idx) in record.keyword.split(',').filter(k => k.trim())" :key="idx" color="blue">
+                {{ kw.trim() }}
+              </a-tag>
+            </a-space>
+            <span v-else>-</span>
           </template>
         </template>
       </a-table>
@@ -60,15 +68,18 @@ const pagination = reactive({
 })
 
 const columns = [
-  { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true },
-  { title: '作者', dataIndex: 'author_name', key: 'author_name' },
-  { title: '阅读量', dataIndex: 'reads', key: 'reads' },
+  { title: '标题', dataIndex: 'title', key: 'title', ellipsis: true, width: 250 },
+  { title: '副标题', dataIndex: 'caption', key: 'caption', ellipsis: true, width: 200 },
+  { title: '作者', dataIndex: 'author', key: 'author', width: 100 },
+  { title: '关键词', dataIndex: 'keyword', key: 'keyword', ellipsis: true, width: 150 },
+  { title: '阅读量', dataIndex: 'seeds', key: 'seeds', width: 80 },
   { 
     title: '发布时间', 
     dataIndex: 'pubtime', 
     key: 'pubtime',
+    width: 180,
     customRender: ({ text }) => {
-      return text ? new Date(text).toLocaleString('zh-CN') : '-'
+      return text ? new Date(text * 1000).toLocaleString('zh-CN') : '-'
     }
   },
   { title: '操作', key: 'action', width: 150, fixed: 'right' }

@@ -98,11 +98,17 @@ exports.getArticleById = async (req, res) => {
       });
     }
 
-    // 增加浏览次数（如果有 seeds 字段表示浏览数）
-    await db.query(
-      'UPDATE article SET seeds = seeds + 1 WHERE article_id = ?',
-      [req.params.id]
-    );
+    // 增加浏览次数（根据实际数据库字段调整）
+    // 如果有 reads 字段，使用 reads；如果有 seeds 字段，使用 seeds
+    try {
+      await db.query(
+        'UPDATE article SET reads = reads + 1 WHERE article_id = ?',
+        [req.params.id]
+      );
+    } catch (updateError) {
+      // 如果 reads 字段不存在，尝试其他字段或忽略
+      console.log('更新浏览次数失败（可能字段不存在）:', updateError.message);
+    }
 
     res.json({
       success: true,

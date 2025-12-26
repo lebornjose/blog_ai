@@ -48,11 +48,11 @@
           <span>分类管理</span>
         </a-menu-item>
         
-        <a-menu-item key="comments">
+        <a-menu-item key="recommends">
           <template #icon>
-            <CommentOutlined />
+            <StarOutlined />
           </template>
-          <span>评论管理</span>
+          <span>推荐管理</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -136,7 +136,7 @@ import {
   UserOutlined,
   FileTextOutlined,
   TagsOutlined,
-  CommentOutlined,
+  StarOutlined,
   DownOutlined,
   SettingOutlined,
   LogoutOutlined
