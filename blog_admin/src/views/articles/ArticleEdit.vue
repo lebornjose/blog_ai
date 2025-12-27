@@ -59,11 +59,7 @@
         </a-form-item>
         
         <a-form-item label="内容" required>
-          <a-textarea
-            v-model:value="form.content"
-            placeholder="请输入文章内容"
-            :rows="15"
-          />
+          <div ref="editorContainer" class="quill-editor"></div>
         </a-form-item>
         
         <a-form-item :wrapper-col="{ offset: 3, span: 20 }">
@@ -82,11 +78,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getArticleById, createArticle, updateArticle } from '@/api/article'
 import { getAllCategories } from '@/api/category'
+import Quill from 'quill'
+import 'quill/dist/quill.snow.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -95,6 +93,8 @@ const loading = ref(false)
 const categoryLoading = ref(false)
 const isEdit = ref(false)
 const categories = ref([])
+const editorContainer = ref(null)
+let quillEditor = null
 
 const form = reactive({
   title: '',
@@ -105,6 +105,33 @@ const form = reactive({
   summary: '',
   content: ''
 })
+
+// 初始化 Quill 编辑器
+const initEditor = () => {
+  if (editorContainer.value && !quillEditor) {
+    quillEditor = new Quill(editorContainer.value, {
+      theme: 'snow',
+      placeholder: '请输入文章内容...',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'align': [] }],
+          ['blockquote', 'code-block'],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    })
+
+    // 监听内容变化
+    quillEditor.on('text-change', () => {
+      form.content = quillEditor.root.innerHTML
+    })
+  }
+}
 
 // 加载分类列表
 const loadCategories = async () => {
@@ -137,7 +164,10 @@ const handleSubmit = async () => {
     message.error('请选择文章分类')
     return
   }
-  if (!form.content) {
+  
+  // 获取编辑器内容
+  const content = quillEditor.root.innerHTML
+  if (!content || content.trim() === '' || content === '<p><br></p>') {
     message.error('请输入文章内容')
     return
   }
@@ -147,6 +177,7 @@ const handleSubmit = async () => {
     // 将关键词数组转换为逗号分隔的字符串
     const submitData = {
       ...form,
+      content: content, // 使用编辑器的 HTML 内容
       keyword: form.keywords.join(',')
     }
     delete submitData.keywords
@@ -180,6 +211,9 @@ onMounted(async () => {
   // 加载分类列表
   await loadCategories()
 
+  // 初始化编辑器
+  initEditor()
+
   // 如果是编辑模式，加载文章详情
   if (route.params.id) {
     isEdit.value = true
@@ -194,11 +228,22 @@ onMounted(async () => {
         form.keywords = article.keyword ? article.keyword.split(',').filter(k => k.trim()) : []
         form.summary = article.summary || ''
         form.content = article.content || ''
+        
+        // 设置编辑器内容
+        if (quillEditor && article.content) {
+          quillEditor.root.innerHTML = article.content
+        }
       }
     } catch (error) {
       message.error('获取文章详情失败')
       console.error(error)
     }
+  }
+})
+
+onBeforeUnmount(() => {
+  if (quillEditor) {
+    quillEditor = null
   }
 })
 </script>
@@ -226,5 +271,37 @@ h2 {
 
 :deep(.ant-card-body) {
   padding: 32px;
+}
+
+/* Quill 编辑器样式 */
+.quill-editor {
+  background: white;
+  min-height: 400px;
+}
+
+:deep(.ql-container) {
+  font-size: 14px;
+  min-height: 400px;
+}
+
+:deep(.ql-editor) {
+  min-height: 400px;
+  line-height: 1.8;
+}
+
+:deep(.ql-editor p) {
+  margin: 10px 0;
+}
+
+:deep(.ql-toolbar) {
+  background: #f8f9fa;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px 4px 0 0;
+}
+
+:deep(.ql-container) {
+  border: 1px solid #d9d9d9;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
 }
 </style>
