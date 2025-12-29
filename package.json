@@ -1,10 +1,10 @@
 {
-  "name": "blog_ai",
-  "version": "1.0.0",
-  "private": true,
-  "workspaces": [
-    "blog_admin",
-    "blog_serve"
+    "name": "blog_ai",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+      "blog_admin",
+      "blog_serve"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:serve\" \"npm run dev:admin\"",
@@ -19,4 +19,4 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
-}
+  }
