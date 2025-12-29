@@ -33,7 +33,7 @@
             </a-select-option>
           </a-select>
         </a-form-item>
-
+        
         <a-form-item label="作者">
           <a-input v-model:value="form.author" placeholder="请输入作者名称" />
         </a-form-item>
@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { getArticleById, createArticle, updateArticle } from '@/api/article'
@@ -95,6 +95,7 @@ const isEdit = ref(false)
 const categories = ref([])
 const editorContainer = ref(null)
 let quillEditor = null
+let isSettingContent = false // 标志位：是否正在设置内容
 
 const form = reactive({
   title: '',
@@ -126,9 +127,11 @@ const initEditor = () => {
       }
     })
 
-    // 监听内容变化
+    // 监听内容变化 - 只在非设置内容时同步
     quillEditor.on('text-change', () => {
-      form.content = quillEditor.root.innerHTML
+      if (!isSettingContent) {
+        form.content = quillEditor.root.innerHTML
+      }
     })
   }
 }
@@ -185,7 +188,7 @@ const handleSubmit = async () => {
     if (isEdit.value) {
       const res = await updateArticle(route.params.id, submitData)
       if (res.success) {
-        message.success('更新成功')
+      message.success('更新成功')
         router.push('/articles')
       } else {
         message.error(res.message || '更新失败')
@@ -193,7 +196,7 @@ const handleSubmit = async () => {
     } else {
       const res = await createArticle(submitData)
       if (res.success) {
-        message.success('创建成功')
+      message.success('创建成功')
         router.push('/articles')
       } else {
         message.error(res.message || '创建失败')
@@ -211,10 +214,7 @@ onMounted(async () => {
   // 加载分类列表
   await loadCategories()
 
-  // 初始化编辑器
-  initEditor()
-
-  // 如果是编辑模式，加载文章详情
+  // 如果是编辑模式，先加载文章详情
   if (route.params.id) {
     isEdit.value = true
     try {
@@ -228,16 +228,29 @@ onMounted(async () => {
         form.keywords = article.keyword ? article.keyword.split(',').filter(k => k.trim()) : []
         form.summary = article.summary || ''
         form.content = article.content || ''
-        
-        // 设置编辑器内容
-        if (quillEditor && article.content) {
-          quillEditor.root.innerHTML = article.content
-        }
       }
     } catch (error) {
       message.error('获取文章详情失败')
       console.error(error)
     }
+  }
+
+  // 等待 DOM 更新后再初始化编辑器
+  await nextTick()
+  
+  // 初始化编辑器
+  initEditor()
+  
+  // 如果有内容，设置到编辑器
+  if (quillEditor && form.content) {
+    isSettingContent = true // 开始设置内容，暂停监听器同步
+    await nextTick()
+    
+    // 使用 clipboard.dangerouslyPasteHTML 方法（Quill 官方推荐的设置 HTML 方式）
+    quillEditor.clipboard.dangerouslyPasteHTML(form.content)
+    
+    await nextTick()
+    isSettingContent = false // 恢复监听器同步
   }
 })
 
