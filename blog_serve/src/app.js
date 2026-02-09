@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -9,6 +10,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// 配置静态文件服务
+app.use(express.static(path.join(__dirname, '../public')));
 
 // 请求日志中间件
 app.use((req, res, next) => {

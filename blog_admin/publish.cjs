@@ -1,9 +1,16 @@
 // 静态文件上传到ali oss
-require('dotenv').config()
+var path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '.env') })
 var OSS = require('ali-oss')
 var fs = require('fs').promises
-var path = require('path')
 var crypto = require('crypto')
+
+console.log('OSS Config:', {
+	region: process.env.OSS_REGION,
+	accessKeyId: process.env.OSS_ACCESS_KEY_ID ? '***' : undefined,
+	accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET ? '***' : undefined,
+	bucket: process.env.OSS_BUCKET,
+})
 
 var client = new OSS({
 	// yourregion填写Bucket所在地域。以华东1（杭州）为例，Region填写为oss-cn-hangzhou。
@@ -13,8 +20,23 @@ var client = new OSS({
 	accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET,
 	bucket: process.env.OSS_BUCKET,
 })
-// 拷贝 dist/*.html 到  blog_serve/下
-fs.copyFile('dist/index.html', '../blog_serve/public/index.html')
+
+// 确保目标目录存在并拷贝 index.html 到 blog_serve/public/
+async function copyIndexFile() {
+	try {
+		const targetDir = path.join(__dirname, '../blog_serve/public')
+		await fs.mkdir(targetDir, { recursive: true })
+		await fs.copyFile(
+			path.join(__dirname, 'dist/index.html'),
+			path.join(targetDir, 'index.html')
+		)
+		console.log('index.html copied to blog_serve/public/')
+	} catch (err) {
+		console.error('Failed to copy index.html:', err.message)
+	}
+}
+
+copyIndexFile()
 
 // 修改 chunk-vendors 文件内容
 async function modifyChunkVendors(filePath) {
@@ -78,7 +100,7 @@ async function uploadToOSS(localFile, baseDir) {
 // 主函数
 async function uploadDirectory() {
 	try {
-		var baseDir = path.resolve('dist')
+		var baseDir = path.resolve('blog_admin/dist')
 		var files = await getAllFiles(baseDir)
 
 		console.log(`Found ${files.length} files to upload`)
