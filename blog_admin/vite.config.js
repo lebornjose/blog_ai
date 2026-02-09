@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: "https://xinblog.oss-cn-qingdao.aliyuncs.com",
   plugins: [
     vue(),
     Components({
