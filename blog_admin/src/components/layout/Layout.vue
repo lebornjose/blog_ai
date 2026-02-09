@@ -54,6 +54,13 @@
           </template>
           <span>推荐管理</span>
         </a-menu-item>
+        
+        <a-menu-item key="pages">
+          <template #icon>
+            <FileOutlined />
+          </template>
+          <span>页面管理</span>
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
     
@@ -137,6 +144,7 @@ import {
   FileTextOutlined,
   TagsOutlined,
   StarOutlined,
+  FileOutlined,
   DownOutlined,
   SettingOutlined,
   LogoutOutlined

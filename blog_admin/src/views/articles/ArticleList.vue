@@ -64,7 +64,16 @@ const articles = ref([])
 const pagination = reactive({
   current: 1,
   pageSize: 10,
-  total: 0
+  total: 0,
+  showSizeChanger: true,
+  showTotal: (total) => `共 ${total} 条`,
+  pageSizeOptions: ['10', '20', '50', '100'],
+  locale: {
+    items_per_page: '条/页',
+    jump_to: '跳至',
+    jump_to_confirm: '确定',
+    page: '页'
+  }
 })
 
 const columns = [

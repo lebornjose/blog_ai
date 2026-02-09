@@ -6,12 +6,9 @@ const { authMiddleware } = require('../middlewares/auth.middleware');
 // 获取文章列表（支持分页、筛选）
 router.get('/list', articleController.getArticles);
 
-router.get('/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'test'
-  });
-});
+// 根据category_id获取文章列表
+router.get('/list/:category_id', articleController.getArticlesByCategoryId);
+
 // 获取单篇文章详情
 router.get('/:id', articleController.getArticleById);
 

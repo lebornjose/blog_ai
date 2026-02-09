@@ -441,3 +441,20 @@ exports.deleteArticle = async (req, res) => {
     });
   }
 };
+
+exports.getArticlesByCategoryId = async (req, res) => {
+  try {
+    const categoryId = req.params.category_id;
+    const [articles] = await db.query(
+      'SELECT * FROM article WHERE category_id = ?',
+      [categoryId]
+    );
+  }
+  catch (error) {
+    console.error('获取文章列表错误:', error);
+    res.status(500).json({
+      success: false,
+      message: '获取文章列表失败'
+    });
+  }
+};

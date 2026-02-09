@@ -58,6 +58,12 @@ const routes = [
         name: 'Recommends',
         component: () => import('@/views/recommends/RecommendList.vue'),
         meta: { title: '推荐管理', icon: 'StarOutlined' }
+      },
+      {
+        path: 'pages',
+        name: 'Pages',
+        component: () => import('@/views/pages/PageList.vue'),
+        meta: { title: '页面管理', icon: 'FileOutlined' }
       }
     ]
   },
