@@ -102,21 +102,57 @@ exports.getArticleById = async (req, res) => {
       });
     }
 
+    const currentArticle = articles[0];
+    const currentPubtime = currentArticle.pubtime;
+
+    // 查询上一篇文章（发布时间早于当前文章的最新一篇）
+    const [prevArticles] = await db.query(
+      `SELECT article_id, title 
+       FROM article 
+       WHERE pubtime < ? 
+       ORDER BY pubtime DESC 
+       LIMIT 1`,
+      [currentPubtime]
+    );
+
+    // 查询下一篇文章（发布时间晚于当前文章的最早一篇）
+    const [nextArticles] = await db.query(
+      `SELECT article_id, title 
+       FROM article 
+       WHERE pubtime > ? 
+       ORDER BY pubtime ASC 
+       LIMIT 1`,
+      [currentPubtime]
+    );
+
     // 增加浏览次数（根据实际数据库字段调整）
     // 如果有 reads 字段，使用 reads；如果有 seeds 字段，使用 seeds
     try {
-    await db.query(
+      await db.query(
         'UPDATE article SET reads = reads + 1 WHERE article_id = ?',
-      [req.params.id]
-    );
+        [req.params.id]
+      );
     } catch (updateError) {
       // 如果 reads 字段不存在，尝试其他字段或忽略
       console.log('更新浏览次数失败（可能字段不存在）:', updateError.message);
     }
 
+    // 构建返回数据
+    const result = {
+      ...currentArticle,
+      prev: prevArticles.length > 0 ? {
+        article_id: prevArticles[0].article_id,
+        title: prevArticles[0].title
+      } : null,
+      next: nextArticles.length > 0 ? {
+        article_id: nextArticles[0].article_id,
+        title: nextArticles[0].title
+      } : null
+    };
+
     res.json({
       success: true,
-      data: articles[0]
+      data: result
     });
   } catch (error) {
     console.error('获取文章错误:', error);
