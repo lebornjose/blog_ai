@@ -22,11 +22,7 @@ app.use((req, res, next) => {
 
 // 路由
 app.get('/', (req, res) => {
-  res.json({
-    message: '欢迎使用博客API',
-    version: '1.0.0',
-    status: 'running'
-  });
+  res.redirect('/index.html');
 });
 
 // 导入路由模块
@@ -34,12 +30,14 @@ const userRoutes = require('./routes/user.routes');
 const articleRoutes = require('./routes/article.routes');
 const categoryRoutes = require('./routes/category.routes');
 const recommendRoutes = require('./routes/recommend.routes');
+const pageRoutes = require('./routes/page.routes');
 
 // 使用路由
 app.use('/api/users', userRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/recommends', recommendRoutes);
+app.use('/api/pages', pageRoutes);
 
 // 404 处理
 app.use((req, res) => {
