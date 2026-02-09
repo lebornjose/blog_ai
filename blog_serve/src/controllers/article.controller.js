@@ -83,7 +83,11 @@ exports.getArticles = async (req, res) => {
 exports.getArticleById = async (req, res) => {
   try {
     const [articles] = await db.query(
-      `SELECT a.*, ad.content, u.username as author_name, u.nick as author_nick
+      `SELECT a.*, 
+              ad.content, 
+              ad.categorys as detail_categorys,
+              u.username as author_name, 
+              u.nick as author_nick
        FROM article a
        LEFT JOIN article_detail ad ON a.article_id = ad.article_id
        LEFT JOIN users u ON a.uid COLLATE utf8_general_ci = u.uid COLLATE utf8_general_ci
